@@ -29,3 +29,21 @@ x=data[,2]
 x
 y
 plot(y~x,main=" Gold deposit proximity vs Sb level")
+glm_out1 = glm(y~x,family=binomial(logit))
+glm_out1
+plot(y~x)
+lines(x,glm_out1$fitted,type="l", col="red")
+
+
+y=data[,4]
+x1=data[,2]
+x2=data[,1]
+x1
+x2
+y
+plot(y~x1+x2,main=" Gold deposit proximity vs (Sb level + As level")
+glm_out2 = glm(y~x1+x2,family=binomial(logit))
+lines(x1+x2,glm_out2$fitted,type="l", col="red")
+
+summary(glm_out1)
+summary(glm_out2)
