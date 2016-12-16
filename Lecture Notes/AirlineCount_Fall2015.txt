@@ -1,0 +1,134 @@
+# First Load data into linux filesystem of VM.
+# For example, use SSH secure file transfer.
+
+
+# Next, load data from linux file system into hdfs
+
+hadoop fs -put testDataNoHdr.csv /user/share/student/
+hadoop fs -put test_25K.csv /user/share/student/
+hadoop fs -put test_203694.csv /user/share/student/
+
+#*******************************************************************************
+# Stuff in rstudio
+#*******************************************************************************
+
+
+# Set environmental variables
+
+Sys.setenv(HADOOP_CMD="/usr/bin/hadoop")
+Sys.setenv(HADOOP_STREAMING="/usr/hdp/2.3.0.0-2557/hadoop-mapreduce/hadoop-streaming-2.7.1.2.3.0.0-2557.jar")
+
+
+
+# Load the following packages in the following order
+
+library(rhdfs)
+library(rmr2)
+
+
+
+# initialize the connection from rstudio to hadoop
+
+hdfs.init()
+
+# Doing simple mapreduce on airline data
+# Our map function which returns the keyval <airline_ID,1>
+
+map1 = function(k,flights) {
+       return ( keyval(as.character(flights[[9]]),1))
+}
+
+
+# Our reduce function which sums up the flights for each airline
+reduce1 = function(carrier, counts) {
+    keyval(carrier, sum(counts))
+}
+
+
+
+# Our mapreduce function which invokes map1 and reduce1 and parses
+# the input file expected it to be comma delimited
+mr1 = function(input, output = NULL) {
+   mapreduce(input = input,
+                    output = output,
+                    input.format = make.input.format("csv", sep=","),
+                    map = map1,
+                    reduce = reduce1)}
+
+
+
+# Set up the input definition (small dataset) and output definition
+hdfs.root = '/user/share/student'
+hdfs.data = file.path(hdfs.root,'testDataNoHdr.csv')
+hdfs.out = file.path(hdfs.root,'out')
+
+
+
+# Invoke out mapreduce job
+out = mr1(hdfs.data, hdfs.out)
+
+
+# Fetch the results from HDFS and coerce into a dataframe
+results = from.dfs(out)
+results.df = as.data.frame(results, stringsAsFactors=F)
+
+
+# add column heading to dataframe
+colnames(results.df) = c('Carrier', 'Flights')
+
+
+
+# Display results
+results.df
+
+#####################################################################
+
+
+# Now try larger dataset
+hdfs.data = file.path(hdfs.root,'test_25K.csv')
+
+# Send output to a different directory since you probably didn't remember
+# to delete the output directory from the preceding run
+hdfs.out = file.path(hdfs.root,'out2')
+
+
+# Invoke out mapreduce job
+out = mr1(hdfs.data, hdfs.out)
+
+# Fetch the results from HDFS and coerce into a dataframe
+results = from.dfs(out)
+results.df = as.data.frame(results, stringsAsFactors=F)
+
+
+# add column heading to dataframe
+colnames(results.df) = c('Carrier', 'Flights')
+
+
+
+# Display results
+results.df
+
+
+####################################################################
+# Now try with really large dataset
+hdfs.data = file.path(hdfs.root,'test_203694.csv')
+
+# Send output to a different directory since you probably didn't remember
+# to delete the output directory from the preceding run
+hdfs.out = file.path(hdfs.root,'out3')
+
+
+# Invoke out mapreduce job
+out = mr1(hdfs.data, hdfs.out)
+
+# Fetch the results from HDFS and coerce into a dataframe
+results = from.dfs(out)
+results.df = as.data.frame(results, stringsAsFactors=F)
+
+
+# add column heading to dataframe
+colnames(results.df) = c('Carrier', 'Flights')
+
+# Display results
+results.df
+

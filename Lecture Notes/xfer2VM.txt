@@ -1,0 +1,16 @@
+Hi Dr. Rose, 
+
+In general what I’ve been doing to download files to my virtual machine is:
+1) ssh into student account on the virtual machine
+2) use: 'wget https://some.web.url/filename.csv' to download filename.csv to the home folder of the virtual machine
+
+For this lab I used:
+wget  https://cse.sc.edu/~rose/587/CSV/testData.csv
+to get the testData file.
+
+To get all the files in one copy paste command you can use:
+wget https://cse.sc.edu/~rose/587/CSV/testData.csv && wget https://cse.sc.edu/~rose/587/CSV/testDataNoHdr.csv && wget https://cse.sc.edu/~rose/587/CSV/test_25K.csv && wget https://cse.sc.edu/~rose/587/CSV/test_203694.csv
+
+Which should download all the files to the home directory of the virtual machine. 
+
+Nick
